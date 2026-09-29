@@ -1,5 +1,8 @@
 # Deriv Fraud Investigation Copilot
 
+**Live demo:** https://2-29-54-185.sslip.io
+**Repository:** https://github.com/cliffordnwanna/deriv_fraud_copilot_demo
+
 An AI-assisted fraud investigation system for financial operations teams.
 
 The system combines deterministic fraud rules, statistical anomaly detection, policy-grounded LLM reasoning, and human-in-the-loop approval gates into a single investigation pipeline.
