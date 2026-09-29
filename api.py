@@ -158,11 +158,12 @@ def health():
         "agents": ["signal_agent", "pattern_agent", "policy_agent", "reasoning_agent"],
         "orchestrator": orchestrator,
         "llm": "OpenAI via reasoning_agent; deterministic fallback available",
-        "vector_store": "TF-IDF RAG (Weaviate-compatible interface)",
+        "vector_store": "OpenAI embeddings RAG (keyword-overlap fallback if no API key)",
         "data_mode": "synthetic scenarios unless an authenticated integration is explicitly configured",
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "deriv_configured": bool(os.getenv("DERIV_API_TOKEN")),
         "slack_configured": bool(os.getenv("SLACK_SIGNING_SECRET")),
+        "telegram_configured": bool(os.getenv("TELEGRAM_BOT_TOKEN") and os.getenv("TELEGRAM_CHAT_ID")),
     }
 
 
@@ -226,6 +227,10 @@ def investigate_scenario(scenario_id: str):
     result["risk_classification"] = classification_map.get(verdict, "UNKNOWN")
     result["ai_recommendation"] = reasoning.get("recommended_action", "Manual review required.")
     result["human_decision_required"] = bool(reasoning.get("human_review_required", verdict != "CLEAR"))
+
+    from tools.telegram_notifier import notify_if_high_risk
+    notify_if_high_risk(result)
+
     return InvestigationResponse(**result)
 
 

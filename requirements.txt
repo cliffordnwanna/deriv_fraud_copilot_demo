@@ -9,3 +9,6 @@ openai>=1.0.0,<2.0
 
 # Deriv WebSocket integration
 websockets>=13,<16
+
+# Telegram alerting
+requests>=2.31,<3.0
