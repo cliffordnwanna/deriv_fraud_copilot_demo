@@ -564,10 +564,6 @@
       <span class="status-dot" id="system-dot"></span>
       <span id="system-label">System Online</span>
     </div>
-    <div class="status-pill" id="deriv-status">
-      <span class="status-dot offline" id="deriv-dot"></span>
-      <span id="deriv-label">Deriv Not Configured</span>
-    </div>
     <div class="tagline">AI Advises · Human Decides</div>
   </div>
 </header>
@@ -1047,49 +1043,17 @@
     if (lastScenario) investigate();
   }
 
-  // Check system status — health first, then attempt real Deriv account verification
+  // Check system status
   async function checkHealth() {
     try {
       const res = await fetch('/health');
       if (res.ok) {
-        const h = await res.json();
         document.getElementById('system-dot').style.background = 'var(--clear)';
         document.getElementById('system-label').textContent    = 'System Online';
-
-        if (h.deriv_configured) {
-          // Token is configured — attempt real account authorisation
-          document.getElementById('deriv-dot').className       = 'status-dot';
-          document.getElementById('deriv-label').textContent   = 'Deriv Connecting…';
-          checkDerivAccount();
-        }
-        // else: stays "Not Configured"
       }
     } catch(e) {
       document.getElementById('system-dot').className       = 'status-dot offline';
       document.getElementById('system-label').textContent   = 'System Offline';
-    }
-  }
-
-  async function checkDerivAccount() {
-    try {
-      const res = await fetch('/live/account');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const d = await res.json();
-      if (d.configured && d.account_id && !d.error) {
-        // Real successful authorisation
-        document.getElementById('deriv-dot').className     = 'status-dot';
-        document.getElementById('deriv-label').textContent =
-          `Deriv Connected · ${esc(d.account_id)} · ${esc(d.currency)}`;
-      } else if (d.error) {
-        document.getElementById('deriv-dot').className     = 'status-dot offline';
-        document.getElementById('deriv-label').textContent = 'Deriv Auth Failed';
-      } else {
-        document.getElementById('deriv-dot').className     = 'status-dot offline';
-        document.getElementById('deriv-label').textContent = 'Deriv Not Configured';
-      }
-    } catch(e) {
-      document.getElementById('deriv-dot').className     = 'status-dot offline';
-      document.getElementById('deriv-label').textContent = 'Deriv Unreachable';
     }
   }
 
