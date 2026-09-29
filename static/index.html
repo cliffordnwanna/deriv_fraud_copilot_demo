@@ -583,17 +583,10 @@
       <div class="case-desc" id="active-case-desc">Select a scenario to begin</div>
     </div>
     <div class="case-controls">
-      <label for="scenario">Investigation Scenario</label>
+      <label for="scenario">Account to Investigate</label>
       <select id="scenario" onchange="onScenarioChange()">
-        <option value="">— Select scenario —</option>
-        <optgroup label="Synthetic scenarios" id="synthetic-group">
-          <option value="CLEAN-001" data-desc="Low-risk retail account, normal activity">CLEAN-001 — Standard retail account</option>
-          <option value="WASH-001" data-desc="Deposit/withdrawal wash cycle, no trading">WASH-001 — Suspected wash trading</option>
-          <option value="ATO-001"  data-desc="Account takeover indicators detected">ATO-001 — Account takeover pattern</option>
-          <option value="MULE-001" data-desc="Coordinated multi-account mule ring">MULE-001 — Money mule network</option>
-          <option value="VEL-001"  data-desc="Rapid-fire transaction velocity spike">VEL-001 — Transaction velocity anomaly</option>
-        </optgroup>
-        <optgroup label="Real accounts (loading…)" id="real-accounts-group"></optgroup>
+        <option value="">— Select account —</option>
+        <optgroup label="Accounts (loading…)" id="real-accounts-group"></optgroup>
       </select>
       <button class="btn-investigate" id="btn-investigate" onclick="investigate()" disabled>
         INVESTIGATE
@@ -711,17 +704,11 @@
 </main>
 
 <footer>
-  Synthetic Investigation Environment · No production customer data · No production actions performed
+  Fraud Investigation Copilot · AI-Assisted AML Analysis · No consequential account actions are executed by this system
 </footer>
 
 <script>
-  const SCENARIOS = {
-    'CLEAN-001': 'Low-risk retail account, normal trading activity',
-    'WASH-001':  'Suspected deposit/withdrawal wash cycle, no trading',
-    'ATO-001':   'Account takeover indicators — device and location anomalies',
-    'MULE-001':  'Coordinated multi-account money mule network',
-    'VEL-001':   'Rapid transaction velocity anomaly'
-  };
+  const SCENARIOS = {};
 
   let lastScenario = null;
 
@@ -739,7 +726,7 @@
     const sel = document.getElementById('scenario');
     const id  = sel.value;
     document.getElementById('active-case-id').textContent   = id || '—';
-    document.getElementById('active-case-desc').textContent = id ? (SCENARIOS[id] || 'Real account') : 'Select a scenario to begin';
+    document.getElementById('active-case-desc').textContent = id ? (SCENARIOS[id] || 'Loading account details…') : 'Select an account to begin';
     document.getElementById('btn-investigate').disabled = !id;
     hideResults();
   }
@@ -750,21 +737,21 @@
       const res = await fetch('/accounts');
       const data = await res.json();
       if (!data.count) {
-        group.label = 'Real accounts (unavailable)';
+        group.label = 'Accounts (unavailable)';
         return;
       }
-      group.label = `Real accounts (${data.count})`;
+      group.label = `Accounts (${data.count})`;
       group.innerHTML = '';
       data.accounts.forEach(acc => {
         const opt = document.createElement('option');
         opt.value = acc.account_id;
         const ratio = acc.withdrawal_ratio != null ? `${Math.round(acc.withdrawal_ratio * 100)}% wr` : '';
         opt.textContent = `${acc.account_id} — ${acc.full_name} (signals: ${acc.risk_signals ?? 0}${ratio ? ', ' + ratio : ''})`;
-        SCENARIOS[acc.account_id] = `Real account — ${acc.risk_signals ?? 0} risk signal(s)${ratio ? ', ' + ratio + ' withdrawal ratio' : ''}`;
+        SCENARIOS[acc.account_id] = `${acc.risk_signals ?? 0} risk signal(s)${ratio ? ', ' + ratio + ' withdrawal ratio' : ''}`;
         group.appendChild(opt);
       });
     } catch (e) {
-      group.label = 'Real accounts (unavailable)';
+      group.label = 'Accounts (unavailable)';
     }
   }
 
@@ -830,11 +817,11 @@
       container.appendChild(makeBtn('✗  Dismiss',          'btn-downgrade'));
       container.appendChild(makeBtn('?  Request Evidence', 'btn-evidence'));
     } else if (c === 'ESCALATE') {
-      container.appendChild(makeBtn('✓  Approve Restriction', 'btn-confirm'));
+      container.appendChild(makeBtn('✓  Approve Escalation', 'btn-confirm'));
       container.appendChild(makeBtn('↓  Downgrade to Review', 'btn-downgrade'));
       container.appendChild(makeBtn('?  Request Evidence',     'btn-evidence'));
     } else {
-      container.appendChild(makeBtn('✓  Confirm Restriction + SAR', 'btn-confirm'));
+      container.appendChild(makeBtn('✓  Confirm Escalation + SAR', 'btn-confirm'));
       container.appendChild(makeBtn('↓  Downgrade to Review',        'btn-downgrade'));
       container.appendChild(makeBtn('?  Request Evidence',            'btn-evidence'));
     }
@@ -915,10 +902,13 @@
     document.getElementById('verdict-label').textContent  = humanLabel(classification);
     document.getElementById('verdict-action').textContent = actionLabel(classification);
 
-    // Metrics — normalise: backend may return 0–1 or 0–100
-    const rawScore = data.signal_analysis?.risk_score ??
+    // Risk score: prefer the reasoning agent's own composite assessment
+    // (it weighs signal + pattern + policy context together) over the raw
+    // signal_analysis score alone, which only reflects deterministic rules.
+    const rawScore = data.reasoning?.risk_score ??
+                     data.signal_analysis?.risk_score ??
                      data.pattern_analysis?.anomaly_score ??
-                     data.risk_score ?? null;
+                     null;
     const normScore = rawScore === null ? null
                     : rawScore <= 1 ? Math.round(rawScore * 100)
                     : Math.round(rawScore);
@@ -960,13 +950,12 @@
       : '<div class="signal-detail" style="padding-top:4px">No rules triggered.</div>';
     document.getElementById('signals-list').innerHTML = signalHtml;
 
-    // Policy
-    const regs = data.policy_context?.applicable_regulations || [];
-    const policyHtml = regs.length
-      ? regs.map(p => `
+    // Policy — policies_retrieved is a flat list of policy IDs
+    const policies = data.policy_context?.policies_retrieved || [];
+    const policyHtml = policies.length
+      ? policies.map(p => `
           <div class="policy-row">
-            <div class="policy-name">${esc(typeof p === 'object' ? p.name || p.regulation || JSON.stringify(p) : p)}</div>
-            ${p.description ? `<div class="policy-desc">${esc(p.description)}</div>` : ''}
+            <div class="policy-name">${esc(p)}</div>
           </div>`)
           .join('')
       : '<div class="signal-detail" style="padding-top:4px">No policy references retrieved.</div>';
