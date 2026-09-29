@@ -10,7 +10,9 @@ Endpoints:
   GET  /investigation/{id}            — retrieve investigation by ID (in-memory for demo)
 """
 from __future__ import annotations
+import asyncio
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Any
 import hashlib
@@ -24,6 +26,16 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    from tools.telegram_bot import launch_background
+    bot_task = launch_background(asyncio.get_event_loop())
+    yield
+    if bot_task is not None:
+        bot_task.cancel()
+
+
 app = FastAPI(
     title="Deriv Fraud Investigation Copilot",
     description=(
@@ -32,6 +44,7 @@ app = FastAPI(
         "Orchestrated via LangGraph with human-in-the-loop escalation gates."
     ),
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -191,8 +204,12 @@ def accounts_list(limit: int = 100):
     return list_accounts(limit=limit)
 
 
-@app.post("/investigate/{scenario_id}", response_model=InvestigationResponse)
-def investigate_scenario(scenario_id: str):
+def run_investigation(scenario_id: str) -> dict:
+    """
+    Shared investigation logic used by both the REST endpoint and the
+    Telegram bot, so the two never drift out of sync.
+    Raises ValueError if scenario_id is not a known scenario or account.
+    """
     from data.synthetic_scenarios import get_scenario, ALL_SCENARIOS
     from agents.orchestrator import investigate
 
@@ -201,14 +218,7 @@ def investigate_scenario(scenario_id: str):
         data_source = "synthetic"
     else:
         from tools.data_normalizer import build_scenario_data
-        try:
-            scenario_data = build_scenario_data(scenario_id)
-        except ValueError:
-            raise HTTPException(
-                status_code=404,
-                detail=f"'{scenario_id}' is not a known synthetic scenario or account ID. "
-                       f"Available scenarios: {list(ALL_SCENARIOS.keys())}",
-            )
+        scenario_data = build_scenario_data(scenario_id)  # raises ValueError if not found
         data_source = scenario_data.get("data_source", "sqlite")
 
     result = investigate(scenario_data)
@@ -231,6 +241,20 @@ def investigate_scenario(scenario_id: str):
     from tools.telegram_notifier import notify_if_high_risk
     notify_if_high_risk(result)
 
+    return result
+
+
+@app.post("/investigate/{scenario_id}", response_model=InvestigationResponse)
+def investigate_scenario(scenario_id: str):
+    from data.synthetic_scenarios import ALL_SCENARIOS
+    try:
+        result = run_investigation(scenario_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"'{scenario_id}' is not a known synthetic scenario or account ID. "
+                   f"Available scenarios: {list(ALL_SCENARIOS.keys())}",
+        )
     return InvestigationResponse(**result)
 
 
