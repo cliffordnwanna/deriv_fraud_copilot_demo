@@ -586,11 +586,14 @@
       <label for="scenario">Investigation Scenario</label>
       <select id="scenario" onchange="onScenarioChange()">
         <option value="">— Select scenario —</option>
-        <option value="CLEAN-001" data-desc="Low-risk retail account, normal activity">CLEAN-001 — Standard retail account</option>
-        <option value="WASH-001" data-desc="Deposit/withdrawal wash cycle, no trading">WASH-001 — Suspected wash trading</option>
-        <option value="ATO-001"  data-desc="Account takeover indicators detected">ATO-001 — Account takeover pattern</option>
-        <option value="MULE-001" data-desc="Coordinated multi-account mule ring">MULE-001 — Money mule network</option>
-        <option value="VEL-001"  data-desc="Rapid-fire transaction velocity spike">VEL-001 — Transaction velocity anomaly</option>
+        <optgroup label="Synthetic scenarios" id="synthetic-group">
+          <option value="CLEAN-001" data-desc="Low-risk retail account, normal activity">CLEAN-001 — Standard retail account</option>
+          <option value="WASH-001" data-desc="Deposit/withdrawal wash cycle, no trading">WASH-001 — Suspected wash trading</option>
+          <option value="ATO-001"  data-desc="Account takeover indicators detected">ATO-001 — Account takeover pattern</option>
+          <option value="MULE-001" data-desc="Coordinated multi-account mule ring">MULE-001 — Money mule network</option>
+          <option value="VEL-001"  data-desc="Rapid-fire transaction velocity spike">VEL-001 — Transaction velocity anomaly</option>
+        </optgroup>
+        <optgroup label="Real accounts (loading…)" id="real-accounts-group"></optgroup>
       </select>
       <button class="btn-investigate" id="btn-investigate" onclick="investigate()" disabled>
         INVESTIGATE
@@ -736,9 +739,33 @@
     const sel = document.getElementById('scenario');
     const id  = sel.value;
     document.getElementById('active-case-id').textContent   = id || '—';
-    document.getElementById('active-case-desc').textContent = id ? SCENARIOS[id] : 'Select a scenario to begin';
+    document.getElementById('active-case-desc').textContent = id ? (SCENARIOS[id] || 'Real account') : 'Select a scenario to begin';
     document.getElementById('btn-investigate').disabled = !id;
     hideResults();
+  }
+
+  async function loadRealAccounts() {
+    const group = document.getElementById('real-accounts-group');
+    try {
+      const res = await fetch('/accounts');
+      const data = await res.json();
+      if (!data.count) {
+        group.label = 'Real accounts (unavailable)';
+        return;
+      }
+      group.label = `Real accounts (${data.count})`;
+      group.innerHTML = '';
+      data.accounts.forEach(acc => {
+        const opt = document.createElement('option');
+        opt.value = acc.account_id;
+        const ratio = acc.withdrawal_ratio != null ? `${Math.round(acc.withdrawal_ratio * 100)}% wr` : '';
+        opt.textContent = `${acc.account_id} — ${acc.full_name} (signals: ${acc.risk_signals ?? 0}${ratio ? ', ' + ratio : ''})`;
+        SCENARIOS[acc.account_id] = `Real account — ${acc.risk_signals ?? 0} risk signal(s)${ratio ? ', ' + ratio + ' withdrawal ratio' : ''}`;
+        group.appendChild(opt);
+      });
+    } catch (e) {
+      group.label = 'Real accounts (unavailable)';
+    }
   }
 
   function hideResults() {
@@ -1074,6 +1101,7 @@
   }
 
   checkHealth();
+  loadRealAccounts();
 </script>
 </body>
 </html>
