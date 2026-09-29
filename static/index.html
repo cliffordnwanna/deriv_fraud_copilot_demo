@@ -893,7 +893,11 @@
   }
 
   function renderResults(data, elapsed) {
-    const classification = data.risk_classification || data.classification || 'BLOCK';
+    // data.verdict is the clean enum (CLEAR/REVIEW/ESCALATE/BLOCK) that
+    // classForVerdict/humanLabel/actionLabel are written against.
+    // risk_classification is a human-readable string for display elsewhere,
+    // not something these lookup functions should switch on.
+    const classification = data.verdict || 'REVIEW';
     const cls = classForVerdict(classification);
 
     // Verdict banner
