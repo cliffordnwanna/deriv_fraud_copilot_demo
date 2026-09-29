@@ -1,0 +1,11 @@
+# Core API
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+pydantic>=2.9,<3.0
+
+# Agent orchestration / reasoning
+langgraph>=0.2,<2.0
+openai>=1.0.0,<2.0
+
+# Deriv WebSocket integration
+websockets>=13,<16

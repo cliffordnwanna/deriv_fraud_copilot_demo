@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fraud Investigation Copilot</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d1117;
+    --panel:     #161b22;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --critical:  #da3633;
+    --escalate:  #e3700a;
+    --review:    #d29922;
+    --clear:     #238636;
+    --accent:    #388bfd;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── TOP BAR ─────────────────────────────────────── */
+  .topbar {
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .topbar-left .product-name {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .topbar-left .product-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--clear);
+    flex-shrink: 0;
+  }
+  .status-dot.offline { background: var(--muted); }
+  .tagline {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    padding-left: 20px;
+  }
+
+  /* ── MAIN LAYOUT ─────────────────────────────────── */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+
+  /* ── CASE HEADER ─────────────────────────────────── */
+  .case-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .case-id-block .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .case-id-block .case-id {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+  .case-id-block .case-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .case-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 220px;
+  }
+  .case-controls label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  select#scenario {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 100%;
+    cursor: pointer;
+  }
+  select#scenario:focus { outline: none; border-color: var(--accent); }
+
+  .btn-investigate {
+    background: var(--critical);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: opacity 0.15s;
+  }
+  .btn-investigate:hover { opacity: 0.85; }
+  .btn-investigate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── LOADING STATE ───────────────────────────────── */
+  #loading {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .loading-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .loading-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .step-icon { width: 18px; text-align: center; font-size: 12px; }
+  .step-icon.done  { color: var(--clear); }
+  .step-icon.pulse { color: var(--accent); animation: blink 1s infinite; }
+  .step-icon.wait  { color: var(--border); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── ERROR STATE ─────────────────────────────────── */
+  #error-panel {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--critical);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .error-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--critical);
+    margin-bottom: 8px;
+  }
+  .error-msg { font-size: 13px; color: var(--muted); }
+  .btn-retry {
+    margin-top: 14px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-retry:hover { border-color: var(--muted); }
+
+  /* ── RESULTS ─────────────────────────────────────── */
+  #results { display: none; }
+
+  /* VERDICT BANNER */
+  .verdict-banner {
+    border-radius: 6px;
+    padding: 20px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .verdict-banner.critical { background: rgba(218,54,51,0.12); border: 1px solid rgba(218,54,51,0.4); }
+  .verdict-banner.escalate { background: rgba(227,112,10,0.12); border: 1px solid rgba(227,112,10,0.4); }
+  .verdict-banner.review   { background: rgba(210,153,34,0.12); border: 1px solid rgba(210,153,34,0.4); }
+  .verdict-banner.clear    { background: rgba(35,134,54,0.12);  border: 1px solid rgba(35,134,54,0.4); }
+
+  .verdict-left .classification {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .verdict-left .verdict-label {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .verdict-banner.critical .verdict-label { color: var(--critical); }
+  .verdict-banner.escalate .verdict-label { color: var(--escalate); }
+  .verdict-banner.review   .verdict-label { color: var(--review); }
+  .verdict-banner.clear    .verdict-label { color: var(--clear); }
+  .verdict-left .verdict-action {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .verdict-metrics {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .v-metric { text-align: center; }
+  .v-metric .val {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .v-metric .key {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+  .sar-badge {
+    background: rgba(218,54,51,0.2);
+    border: 1px solid var(--critical);
+    color: var(--critical);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* TIMING */
+  .timing-row {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  /* NARRATIVE */
+  .section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .narrative-text {
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* EVIDENCE + POLICY */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .evidence-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .evidence-row:last-child { border-bottom: none; }
+  .evidence-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .dot-critical { background: var(--critical); }
+  .dot-escalate { background: var(--escalate); }
+  .dot-review   { background: var(--review); }
+  .dot-clear    { background: var(--clear); }
+  .dot-muted    { background: var(--muted); }
+
+  .evidence-text .signal-name {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .evidence-text .signal-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .policy-row {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .policy-row:last-child { border-bottom: none; }
+  .policy-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .policy-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* AI RECOMMENDATION */
+  .recommendation-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .rec-footer {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* DECISION */
+  .decision-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .decision-header {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .decision-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .decision-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-decision {
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s;
+  }
+  .btn-decision:hover { opacity: 0.8; }
+  .btn-confirm  { background: none; border-color: var(--critical); color: var(--critical); }
+  .btn-confirm.clear-btn { border-color: var(--clear); color: var(--clear); }
+  .btn-downgrade { background: none; border-color: var(--border); color: var(--muted); }
+  .btn-evidence  { background: none; border-color: var(--border); color: var(--muted); }
+  .decision-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .decision-confirm-msg {
+    display: none;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--clear);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  /* AUDIT TRAIL */
+  .audit-toggle {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .audit-toggle:hover { color: var(--text); }
+  .audit-arrow { transition: transform 0.2s; }
+  .audit-arrow.open { transform: rotate(90deg); }
+
+  .audit-body {
+    display: none;
+    margin-top: 16px;
+  }
+  .audit-step {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 20px;
+    position: relative;
+  }
+  .audit-step::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 22px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+  .audit-step:last-child::before { display: none; }
+  .audit-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--panel);
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .audit-dot.done { border-color: var(--clear); background: rgba(35,134,54,0.2); }
+  .audit-dot.wait { border-color: var(--review); background: rgba(210,153,34,0.1); }
+  .audit-content .agent-name {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+  .audit-content .agent-status {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 32px;
+  }
+
+  /* HELPERS */
+  .hidden { display: none !important; }
+  .mt-8  { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="product-name">Fraud Investigation Copilot</div>
+    <div class="product-sub">AI-Assisted Financial Crime Investigation</div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill" id="system-status">
+      <span class="status-dot" id="system-dot"></span>
+      <span id="system-label">System Online</span>
+    </div>
+    <div class="status-pill" id="deriv-status">
+      <span class="status-dot offline" id="deriv-dot"></span>
+      <span id="deriv-label">Deriv Not Configured</span>
+    </div>
+    <div class="tagline">AI Advises · Human Decides</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- CASE HEADER -->
+  <div class="case-header">
+    <div class="case-id-block">
+      <div class="label">Active Case</div>
+      <div class="case-id" id="active-case-id">—</div>
+      <div class="case-desc" id="active-case-desc">Select a scenario to begin</div>
+    </div>
+    <div class="case-controls">
+      <label for="scenario">Investigation Scenario</label>
+      <select id="scenario" onchange="onScenarioChange()">
+        <option value="">— Select scenario —</option>
+        <option value="CLEAN-001" data-desc="Low-risk retail account, normal activity">CLEAN-001 — Standard retail account</option>
+        <option value="WASH-001" data-desc="Deposit/withdrawal wash cycle, no trading">WASH-001 — Suspected wash trading</option>
+        <option value="ATO-001"  data-desc="Account takeover indicators detected">ATO-001 — Account takeover pattern</option>
+        <option value="MULE-001" data-desc="Coordinated multi-account mule ring">MULE-001 — Money mule network</option>
+        <option value="VEL-001"  data-desc="Rapid-fire transaction velocity spike">VEL-001 — Transaction velocity anomaly</option>
+      </select>
+      <button class="btn-investigate" id="btn-investigate" onclick="investigate()" disabled>
+        INVESTIGATE
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loading-title">Investigation Pipeline Running</div>
+    <div class="loading-steps" id="loading-steps">
+      <div class="loading-step">
+        <span class="step-icon wait" id="step-signal">◯</span>
+        <span>Signal Agent — S1.0 deterministic rules</span>
+      </div>
+      <div class="loading-step">
+        <span class="step-icon wait" id="step-pattern">◯</span>
+        <span>Pattern Agent — S2.0 statistical engine</span>
+      </div>
+      <div class="loading-step">
+        <span class="step-icon wait" id="step-policy">◯</span>
+        <span>Policy Agent — TF-IDF RAG retrieval</span>
+      </div>
+      <div class="loading-step">
+        <span class="step-icon wait" id="step-reason">◯</span>
+        <span>Reasoning Agent — GPT-4o-mini synthesis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-panel">
+    <div class="error-title">Investigation Failed</div>
+    <div class="error-msg" id="error-msg">Unable to complete the investigation. Check that the server is running.</div>
+    <button class="btn-retry" onclick="retry()">Retry</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- VERDICT BANNER -->
+    <div class="verdict-banner" id="verdict-banner">
+      <div class="verdict-left">
+        <div class="classification">Classification</div>
+        <div class="verdict-label" id="verdict-label">—</div>
+        <div class="verdict-action" id="verdict-action">—</div>
+      </div>
+      <div class="verdict-metrics">
+        <div class="v-metric">
+          <div class="val" id="risk-score">—</div>
+          <div class="key">Risk Score</div>
+        </div>
+        <div class="v-metric">
+          <div class="val" id="confidence">—</div>
+          <div class="key">Confidence</div>
+        </div>
+        <div class="sar-badge hidden" id="sar-badge">⚠ SAR Required</div>
+      </div>
+    </div>
+
+    <!-- TIMING -->
+    <div class="timing-row" id="timing-row"></div>
+
+    <!-- WHAT WE FOUND -->
+    <div class="section">
+      <div class="section-label">What We Found</div>
+      <div class="narrative-text" id="narrative"></div>
+    </div>
+
+    <!-- EVIDENCE + POLICY -->
+    <div class="two-col">
+      <div class="section" style="margin-bottom:0">
+        <div class="section-label">Triggered Signals</div>
+        <div id="signals-list"></div>
+      </div>
+      <div class="section" style="margin-bottom:0">
+        <div class="section-label">Policy Context</div>
+        <div id="policy-list"></div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+
+    <!-- AI RECOMMENDATION -->
+    <div class="section">
+      <div class="section-label">AI Recommendation</div>
+      <div class="recommendation-text" id="recommendation"></div>
+      <div class="rec-footer">AI advises — human decides. No consequential action has been taken.</div>
+    </div>
+
+    <!-- HUMAN DECISION -->
+    <div class="decision-section">
+      <div class="decision-header">Human Decision Required</div>
+      <div class="decision-desc">
+        The AI has completed its investigation. A human investigator must review the evidence
+        and make the consequential decision. All decisions are logged for audit.
+      </div>
+      <div class="decision-buttons" id="decision-buttons"></div>
+      <div class="decision-confirm-msg" id="decision-confirm">
+        ✓ Demo decision recorded — no production action was taken.
+      </div>
+      <div class="decision-note">AI advises · Human decides · All decisions are logged.</div>
+    </div>
+
+    <!-- AUDIT TRAIL -->
+    <div class="section">
+      <button class="audit-toggle" onclick="toggleAudit()">
+        <span class="audit-arrow" id="audit-arrow">▸</span>
+        View Investigation Audit Trail
+      </button>
+      <div class="audit-body" id="audit-body"></div>
+    </div>
+
+  </div><!-- /results -->
+
+</main>
+
+<footer>
+  Synthetic Investigation Environment · No production customer data · No production actions performed
+</footer>
+
+<script>
+  const SCENARIOS = {
+    'CLEAN-001': 'Low-risk retail account, normal trading activity',
+    'WASH-001':  'Suspected deposit/withdrawal wash cycle, no trading',
+    'ATO-001':   'Account takeover indicators — device and location anomalies',
+    'MULE-001':  'Coordinated multi-account money mule network',
+    'VEL-001':   'Rapid transaction velocity anomaly'
+  };
+
+  let lastScenario = null;
+
+  function esc(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function onScenarioChange() {
+    const sel = document.getElementById('scenario');
+    const id  = sel.value;
+    document.getElementById('active-case-id').textContent   = id || '—';
+    document.getElementById('active-case-desc').textContent = id ? SCENARIOS[id] : 'Select a scenario to begin';
+    document.getElementById('btn-investigate').disabled = !id;
+    hideResults();
+  }
+
+  function hideResults() {
+    document.getElementById('results').style.display      = 'none';
+    document.getElementById('error-panel').style.display  = 'none';
+    document.getElementById('loading').style.display      = 'none';
+  }
+
+  function classForVerdict(v) {
+    if (!v) return 'critical';
+    const s = v.toUpperCase();
+    if (s.includes('CLEAR'))    return 'clear';
+    if (s.includes('REVIEW'))   return 'review';
+    if (s.includes('ESCALATE')) return 'escalate';
+    return 'critical';
+  }
+
+  function humanLabel(v) {
+    if (!v) return 'Critical Risk';
+    const s = v.toUpperCase();
+    if (s === 'CLEAR')    return 'Clear — No Immediate Action';
+    if (s === 'REVIEW')   return 'Review Required';
+    if (s === 'ESCALATE') return 'Escalation Required';
+    if (s === 'BLOCK')    return 'Critical Risk — Block Recommended';
+    return v;
+  }
+
+  function actionLabel(v) {
+    const s = (v || '').toUpperCase();
+    if (s === 'CLEAR')    return 'No further action required at this time.';
+    if (s === 'REVIEW')   return 'Additional review recommended before any action.';
+    if (s === 'ESCALATE') return 'Escalate to senior investigator. Account restriction recommended.';
+    return 'Immediate action required. Account restriction and SAR review recommended.';
+  }
+
+  function dotClass(v) {
+    const s = (v || '').toUpperCase();
+    if (s.includes('CLEAR'))    return 'dot-clear';
+    if (s.includes('REVIEW'))   return 'dot-review';
+    if (s.includes('ESCALAT'))  return 'dot-escalate';
+    return 'dot-critical';
+  }
+
+  function buildDecisionButtons(classification) {
+    const c = (classification || '').toUpperCase();
+    const container = document.getElementById('decision-buttons');
+    container.innerHTML = '';
+
+    function makeBtn(label, cls) {
+      const b = document.createElement('button');
+      b.className = 'btn-decision ' + cls;
+      b.textContent = label;
+      b.onclick = () => recordDecision();
+      return b;
+    }
+
+    if (c === 'CLEAR') {
+      container.appendChild(makeBtn('✓  Approve — No Action', 'btn-confirm clear-btn'));
+      container.appendChild(makeBtn('⚑  Flag for Review',      'btn-downgrade'));
+    } else if (c === 'REVIEW') {
+      container.appendChild(makeBtn('✓  Confirm Review',   'btn-confirm'));
+      container.appendChild(makeBtn('✗  Dismiss',          'btn-downgrade'));
+      container.appendChild(makeBtn('?  Request Evidence', 'btn-evidence'));
+    } else if (c === 'ESCALATE') {
+      container.appendChild(makeBtn('✓  Approve Restriction', 'btn-confirm'));
+      container.appendChild(makeBtn('↓  Downgrade to Review', 'btn-downgrade'));
+      container.appendChild(makeBtn('?  Request Evidence',     'btn-evidence'));
+    } else {
+      container.appendChild(makeBtn('✓  Confirm Restriction + SAR', 'btn-confirm'));
+      container.appendChild(makeBtn('↓  Downgrade to Review',        'btn-downgrade'));
+      container.appendChild(makeBtn('?  Request Evidence',            'btn-evidence'));
+    }
+  }
+
+  function recordDecision() {
+    document.getElementById('decision-confirm').style.display = 'block';
+    document.querySelectorAll('.btn-decision').forEach(b => b.disabled = true);
+  }
+
+  function toggleAudit() {
+    const body  = document.getElementById('audit-body');
+    const arrow = document.getElementById('audit-arrow');
+    const open  = body.style.display === 'block';
+    body.style.display  = open ? 'none' : 'block';
+    arrow.classList.toggle('open', !open);
+  }
+
+  function renderAudit(data) {
+    const steps = [
+      {
+        name:   'Signal Agent (S1.0)',
+        status: 'Completed — Deterministic rule evaluation',
+        detail: data.signal_analysis
+          ? `${(data.signal_analysis.triggered_rules || []).length} rule(s) triggered`
+          : 'No signal data',
+        done: true
+      },
+      {
+        name:   'Pattern Agent (S2.0)',
+        status: 'Completed — Statistical anomaly detection',
+        detail: data.pattern_analysis
+          ? `Anomaly score: ${esc(data.pattern_analysis.anomaly_score)}`
+          : 'No pattern data',
+        done: true
+      },
+      {
+        name:   'Policy Agent',
+        status: 'Completed — TF-IDF policy retrieval',
+        detail: data.policy_context
+          ? `${(data.policy_context.applicable_regulations || []).length} regulation(s) cited`
+          : 'No policy data',
+        done: true
+      },
+      {
+        name:   'Reasoning Agent (GPT-4o-mini)',
+        status: 'Completed — AI recommendation generated',
+        detail: 'OpenAI gpt-4o-mini',
+        done: true
+      },
+      {
+        name:   'Human Gate',
+        status: 'Awaiting investigator decision',
+        detail: 'AI advises — human decides',
+        done: false
+      }
+    ];
+
+    document.getElementById('audit-body').innerHTML = steps.map(s => `
+      <div class="audit-step">
+        <div class="audit-dot ${s.done ? 'done' : 'wait'}"></div>
+        <div class="audit-content">
+          <div class="agent-name">${esc(s.name)}</div>
+          <div class="agent-status">${esc(s.status)}</div>
+          <div class="agent-status">${esc(s.detail)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderResults(data, elapsed) {
+    const classification = data.risk_classification || data.classification || 'BLOCK';
+    const cls = classForVerdict(classification);
+
+    // Verdict banner
+    const banner = document.getElementById('verdict-banner');
+    banner.className = 'verdict-banner ' + cls;
+    document.getElementById('verdict-label').textContent  = humanLabel(classification);
+    document.getElementById('verdict-action').textContent = actionLabel(classification);
+
+    // Metrics — normalise: backend may return 0–1 or 0–100
+    const rawScore = data.signal_analysis?.risk_score ??
+                     data.pattern_analysis?.anomaly_score ??
+                     data.risk_score ?? null;
+    const normScore = rawScore === null ? null
+                    : rawScore <= 1 ? Math.round(rawScore * 100)
+                    : Math.round(rawScore);
+    document.getElementById('risk-score').textContent = normScore !== null ? normScore + '/100' : '—';
+
+    const rawConf = data.reasoning?.confidence ?? data.confidence ?? null;
+    const normConf = rawConf === null ? null
+                   : rawConf <= 1 ? Math.round(rawConf * 100)
+                   : Math.round(rawConf);
+    document.getElementById('confidence').textContent = normConf !== null ? normConf + '%' : '—';
+
+    const sarRequired = data.reasoning?.sar_required ?? data.sar_required ?? false;
+    document.getElementById('sar-badge').classList.toggle('hidden', !sarRequired);
+
+    // Timing
+    document.getElementById('timing-row').textContent =
+      `Investigation completed in ${elapsed.toFixed(1)}s`;
+
+    // Narrative
+    const primary  = data.reasoning?.primary_concern   || data.primary_concern  || '';
+    const detailed = data.reasoning?.detailed_reasoning || data.detailed_reasoning || '';
+    const narrative = primary && detailed
+      ? primary + ' ' + detailed
+      : primary || detailed || (data.ai_recommendation || '');
+    document.getElementById('narrative').textContent = narrative;
+
+    // Signals
+    const rules = data.signal_analysis?.triggered_rules || [];
+    const signalHtml = rules.length
+      ? rules.map(r => `
+          <div class="evidence-row">
+            <span class="evidence-dot ${dotClass(classification)}"></span>
+            <div class="evidence-text">
+              <div class="signal-name">${esc(typeof r === 'object' ? r.rule || r.name || JSON.stringify(r) : r)}</div>
+              ${r.detail ? `<div class="signal-detail">${esc(r.detail)}</div>` : ''}
+            </div>
+          </div>`)
+          .join('')
+      : '<div class="signal-detail" style="padding-top:4px">No rules triggered.</div>';
+    document.getElementById('signals-list').innerHTML = signalHtml;
+
+    // Policy
+    const regs = data.policy_context?.applicable_regulations || [];
+    const policyHtml = regs.length
+      ? regs.map(p => `
+          <div class="policy-row">
+            <div class="policy-name">${esc(typeof p === 'object' ? p.name || p.regulation || JSON.stringify(p) : p)}</div>
+            ${p.description ? `<div class="policy-desc">${esc(p.description)}</div>` : ''}
+          </div>`)
+          .join('')
+      : '<div class="signal-detail" style="padding-top:4px">No policy references retrieved.</div>';
+    document.getElementById('policy-list').innerHTML = policyHtml;
+
+    // AI Recommendation
+    const rec = data.reasoning?.recommended_action || data.ai_recommendation || 'No recommendation generated.';
+    document.getElementById('recommendation').textContent = rec;
+
+    // Decision buttons
+    buildDecisionButtons(classification);
+    document.getElementById('decision-confirm').style.display = 'none';
+
+    // Audit
+    renderAudit(data);
+    document.getElementById('audit-body').style.display = 'none';
+    document.getElementById('audit-arrow').classList.remove('open');
+
+    document.getElementById('results').style.display = 'block';
+  }
+
+  async function investigate() {
+    const scenario = document.getElementById('scenario').value;
+    if (!scenario) return;
+
+    lastScenario = scenario;
+    hideResults();
+
+    const btn = document.getElementById('btn-investigate');
+    btn.disabled  = true;
+    btn.textContent = 'INVESTIGATING…';
+
+    const loading = document.getElementById('loading');
+    loading.style.display = 'block';
+
+    const steps = ['step-signal','step-pattern','step-policy','step-reason'];
+    steps.forEach(id => {
+      document.getElementById(id).className = 'step-icon wait';
+      document.getElementById(id).textContent = '◯';
+    });
+
+    let stepIdx = 0;
+    const advance = setInterval(() => {
+      if (stepIdx < steps.length) {
+        if (stepIdx > 0) {
+          document.getElementById(steps[stepIdx-1]).className   = 'step-icon done';
+          document.getElementById(steps[stepIdx-1]).textContent = '✓';
+        }
+        document.getElementById(steps[stepIdx]).className   = 'step-icon pulse';
+        document.getElementById(steps[stepIdx]).textContent = '…';
+        stepIdx++;
+      }
+    }, 400);
+
+    const t0 = Date.now();
+    try {
+      const res = await fetch(`/investigate/${scenario}`, { method: 'POST' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const elapsed = (Date.now() - t0) / 1000;
+
+      clearInterval(advance);
+      steps.forEach(id => {
+        document.getElementById(id).className   = 'step-icon done';
+        document.getElementById(id).textContent = '✓';
+      });
+
+      await new Promise(r => setTimeout(r, 300));
+      loading.style.display = 'none';
+      renderResults(data, elapsed);
+
+    } catch (err) {
+      clearInterval(advance);
+      loading.style.display = 'none';
+      document.getElementById('error-msg').textContent =
+        `Unable to complete the investigation: ${err.message}`;
+      document.getElementById('error-panel').style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'INVESTIGATE';
+    }
+  }
+
+  function retry() {
+    if (lastScenario) investigate();
+  }
+
+  // Check system status — health first, then attempt real Deriv account verification
+  async function checkHealth() {
+    try {
+      const res = await fetch('/health');
+      if (res.ok) {
+        const h = await res.json();
+        document.getElementById('system-dot').style.background = 'var(--clear)';
+        document.getElementById('system-label').textContent    = 'System Online';
+
+        if (h.deriv_configured) {
+          // Token is configured — attempt real account authorisation
+          document.getElementById('deriv-dot').className       = 'status-dot';
+          document.getElementById('deriv-label').textContent   = 'Deriv Connecting…';
+          checkDerivAccount();
+        }
+        // else: stays "Not Configured"
+      }
+    } catch(e) {
+      document.getElementById('system-dot').className       = 'status-dot offline';
+      document.getElementById('system-label').textContent   = 'System Offline';
+    }
+  }
+
+  async function checkDerivAccount() {
+    try {
+      const res = await fetch('/live/account');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const d = await res.json();
+      if (d.configured && d.account_id && !d.error) {
+        // Real successful authorisation
+        document.getElementById('deriv-dot').className     = 'status-dot';
+        document.getElementById('deriv-label').textContent =
+          `Deriv Connected · ${esc(d.account_id)} · ${esc(d.currency)}`;
+      } else if (d.error) {
+        document.getElementById('deriv-dot').className     = 'status-dot offline';
+        document.getElementById('deriv-label').textContent = 'Deriv Auth Failed';
+      } else {
+        document.getElementById('deriv-dot').className     = 'status-dot offline';
+        document.getElementById('deriv-label').textContent = 'Deriv Not Configured';
+      }
+    } catch(e) {
+      document.getElementById('deriv-dot').className     = 'status-dot offline';
+      document.getElementById('deriv-label').textContent = 'Deriv Unreachable';
+    }
+  }
+
+  checkHealth();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+.DS_Store
+Thumbs.db
+
+# Synthetic dataset — deterministic (seed 42), regenerate via:
+#   python data/generate_dataset.py
+data/fraud_cases.db
+data/*.csv

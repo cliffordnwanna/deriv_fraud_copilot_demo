@@ -1,0 +1,212 @@
+[
+  {
+    "policy_id": "FATF-R1",
+    "title": "FATF Recommendation 1 – Risk-Based Approach",
+    "category": "risk_assessment",
+    "source": "FATF 40 Recommendations (2012, updated 2023)",
+    "text": "Countries and financial institutions should identify, assess, and understand their money laundering and terrorist financing risks. The risk-based approach requires that higher-risk situations receive enhanced measures and lower-risk situations may receive simplified measures. All customers must be assessed at onboarding and periodically thereafter. Risk factors include customer type, geographic location, products and services used, and transaction patterns."
+  },
+  {
+    "policy_id": "FATF-R10",
+    "title": "FATF Recommendation 10 – Customer Due Diligence (CDD)",
+    "category": "kyc",
+    "source": "FATF 40 Recommendations (2012, updated 2023)",
+    "text": "Financial institutions must apply Customer Due Diligence (CDD) measures when establishing business relationships, carrying out occasional transactions above USD/EUR 15,000, or when there is a suspicion of money laundering or terrorist financing. CDD includes identifying and verifying customer identity, understanding the nature and purpose of the business relationship, and conducting ongoing monitoring. Failure to complete CDD is grounds for refusing to open an account or terminating the relationship. Multiple failed KYC attempts constitute a strong risk indicator requiring escalation."
+  },
+  {
+    "policy_id": "FATF-R12",
+    "title": "FATF Recommendation 12 – Politically Exposed Persons (PEPs)",
+    "category": "pep_screening",
+    "source": "FATF 40 Recommendations (2012, updated 2023)",
+    "text": "Financial institutions must apply enhanced due diligence measures to foreign PEPs, domestic PEPs, and persons entrusted with a prominent function in an international organisation, in addition to their family members and close associates. Enhanced measures include: obtaining senior management approval for establishing the business relationship, taking reasonable measures to establish the source of wealth and source of funds, and conducting enhanced ongoing monitoring of the business relationship. A PEP flag requires automatic escalation to compliance review regardless of transaction size. PEP status does not expire — former PEPs retain elevated risk status for a minimum of 12 months after leaving office."
+  },
+  {
+    "policy_id": "FATF-R16",
+    "title": "FATF Recommendation 16 – Wire Transfers and Payment Transparency",
+    "category": "wire_transfer",
+    "source": "FATF 40 Recommendations (2012, updated 2023)",
+    "text": "Financial institutions must include accurate originator and beneficiary information on all wire transfers and value transfers. Originator information must include name, account number, and address or national identity number. Beneficiary information must include name and account number. Missing or incomplete payment chain information is a red flag requiring investigation. Transfers to or from jurisdictions that do not comply with FATF standards represent elevated risk. Any transfer above USD/EUR 1,000 that lacks complete originator information should be treated as suspicious."
+  },
+  {
+    "policy_id": "FATF-R20",
+    "title": "FATF Recommendation 20 – Suspicious Transaction Reporting",
+    "category": "sar_filing",
+    "source": "FATF 40 Recommendations (2012, updated 2023)",
+    "text": "Financial institutions must report suspicious transactions to the financial intelligence unit (FIU) promptly when they suspect or have reasonable grounds to suspect that funds are the proceeds of criminal activity or related to terrorist financing. The obligation to report is not conditional on the amount — even small transactions must be reported if suspicion exists. Institutions must not tip off the customer that a SAR has been or may be filed. Previous SAR filings on an account are a material risk indicator — accounts with prior SARs require enhanced monitoring. Suspicious transactions include but are not limited to: structuring, unusual velocity, rapid fund movement, inconsistency with customer profile, and unexplained high-risk jurisdiction involvement."
+  },
+  {
+    "policy_id": "FATF-VA-RF1",
+    "title": "FATF Virtual Assets Red Flag – Account Takeover Pattern",
+    "category": "account_takeover",
+    "source": "FATF Report: Virtual Assets Red Flag Indicators of Money Laundering (2020)",
+    "text": "Account takeover indicators include: a customer frequently changing identification information such as email addresses, IP addresses, or financial information; discrepancies between the registered IP address and transaction-initiation location; credentials or identification information shared across multiple accounts; sudden activity on previously dormant accounts; login attempts from new devices or geographic locations not previously associated with the account; multiple failed authentication attempts followed by a successful login from a different IP or device. When an account takeover is suspected, all withdrawal and transfer activity should be suspended pending investigation. An open complaint about unauthorised access combined with a new payment method from a foreign country is a critical combined indicator requiring immediate escalation."
+  },
+  {
+    "policy_id": "FATF-VA-RF2",
+    "title": "FATF Virtual Assets Red Flag – Structuring and Threshold Avoidance",
+    "category": "structuring",
+    "source": "FATF Report: Virtual Assets Red Flag Indicators of Money Laundering (2020)",
+    "text": "Structuring is the deliberate splitting of transactions into amounts below reporting or recording thresholds to avoid detection. Red flags include: conducting multiple transactions in amounts just below reporting thresholds (e.g. USD 9,999 when the threshold is USD 10,000); making deposits through multiple channels on the same or consecutive days with amounts individually below threshold but collectively above it; rapid succession of smaller deposits followed by a single large withdrawal; deposits below USD 500 that are disproportionately frequent given the account profile. Under US law (31 U.S.C. § 5324), structuring is illegal regardless of whether the underlying funds are lawful. The standard threshold for Currency Transaction Reports (CTRs) is USD 10,000. A SAR should be filed when structuring is suspected at or above USD 5,000."
+  },
+  {
+    "policy_id": "FATF-VA-RF3",
+    "title": "FATF Virtual Assets Red Flag – Mule Account Networks",
+    "category": "mule_account",
+    "source": "FATF Report: Virtual Assets Red Flag Indicators of Money Laundering (2020)",
+    "text": "Mule account networks involve multiple accounts used to receive, aggregate, and transfer illicit funds. Key indicators include: a large number of accounts controlled from the same IP address or device ID; multiple accounts linked by shared residential address, phone number, or device fingerprint; accounts that receive funds and immediately transfer them with minimal trading activity; shared payment methods or card BINs across multiple accounts; coordinated behaviour such as simultaneous deposits or withdrawals across linked accounts; accounts opened with similar documentation or by the same referring entity. When two or more accounts share a device ID or IP address, they must be investigated as a potential ring. Ring membership of three or more accounts with high withdrawal ratios constitutes a critical fraud indicator requiring immediate SAR filing."
+  },
+  {
+    "policy_id": "FATF-VA-RF4",
+    "title": "FATF Virtual Assets Red Flag – Rapid Deposit-to-Withdrawal Cycling",
+    "category": "rapid_cycling",
+    "source": "FATF Report: Virtual Assets Red Flag Indicators of Money Laundering (2020)",
+    "text": "Layering through rapid fund cycling involves depositing funds and withdrawing them quickly without meaningful economic activity. Red flags include: funds deposited and withdrawn within 24–72 hours without corresponding trading activity; withdrawal ratio exceeding 85% of total deposits within a 90-day observation window; entire balance withdrawal attempts shortly after account opening; large deposits immediately followed by full or near-full withdrawals with no intervening trading. The layering phase of money laundering typically shows: average time from deposit to withdrawal under 48 hours; withdrawal amounts closely mirroring deposit amounts; minimal or zero net trading profit despite high account turnover. A withdrawal-to-deposit ratio above 0.90 combined with low trading volume is a strong indicator of pass-through money movement."
+  },
+  {
+    "policy_id": "FATF-VA-RF5",
+    "title": "FATF Virtual Assets Red Flag – Geographic and Jurisdictional Anomalies",
+    "category": "geographic_risk",
+    "source": "FATF Report: Virtual Assets Red Flag Indicators of Money Laundering (2020)",
+    "text": "Geographic red flags include: logins or transactions initiated from jurisdictions inconsistent with the customer's registered country; use of VPNs, TOR, or IP anonymisation services to obscure geographic origin; funds transfers to or from FATF grey-listed or black-listed jurisdictions without commercial justification; sudden change in account activity associated with a geographic shift (e.g., all prior logins from one country followed by logins from a high-risk jurisdiction). Countries on the FATF grey list include but are not limited to: Philippines, South Africa, Yemen, Syria, and others as periodically updated. Transactions involving OFAC-sanctioned countries (Iran, North Korea, Cuba, Syria) require immediate blocking and filing."
+  },
+  {
+    "policy_id": "FFIEC-RF1",
+    "title": "FFIEC BSA/AML – Structuring Red Flags",
+    "category": "structuring",
+    "source": "FFIEC BSA/AML Examination Manual, Appendix F – Money Laundering Red Flags",
+    "text": "The following constitute structuring red flags under BSA/AML examination standards: currency is deposited or withdrawn in amounts just below identification or reporting thresholds; a person makes multiple deposits on the same day at the same or different branches; deposits are made through multiple individuals entering simultaneously (smurfing); the ATM is used to make several deposits below a specified threshold; small funds transfers are ordered in an apparent effort to avoid triggering identification or reporting requirements. Structuring is illegal regardless of the source of funds. Examination standard: three or more transactions between $5,000–$9,999 within a 30-day period on the same account warrants SAR consideration."
+  },
+  {
+    "policy_id": "FFIEC-RF2",
+    "title": "FFIEC BSA/AML – Account Activity Red Flags",
+    "category": "account_behaviour",
+    "source": "FFIEC BSA/AML Examination Manual, Appendix F – Money Laundering Red Flags",
+    "text": "Account activity red flags include: large deposits and withdrawals during a short time period after account opening, followed by account closure; multiple personal accounts used to collect and funnel funds to a small number of foreign beneficiaries; unusual transfers of funds among related accounts or accounts involving the same or related principals; accounts opened specifically to receive and transmit funds with minimal other activity; a single transaction exceeding 300% of the customer's historical average transaction size; sudden reactivation of a dormant account with large transactions; accounts with no apparent business purpose for the volume or frequency of transactions."
+  },
+  {
+    "policy_id": "FFIEC-RF3",
+    "title": "FFIEC BSA/AML – Geographic and Jurisdictional Red Flags",
+    "category": "geographic_risk",
+    "source": "FFIEC BSA/AML Examination Manual, Appendix F – Money Laundering Red Flags",
+    "text": "Geographic red flags include: funds transfer activity to or from a financial secrecy haven or high-risk geographic location without apparent business reason; transactions with noncooperative countries and territories; multiple transactions involving jurisdictions known for weak AML/CFT enforcement; routing of funds through multiple jurisdictions with no logical business justification; transactions with countries subject to OFAC sanctions. Any login or transaction originating from a sanctioned country requires immediate blocking and regulatory notification within 10 business days."
+  },
+  {
+    "policy_id": "FFIEC-RF4",
+    "title": "FFIEC BSA/AML – Layering and Complex Transaction Structures",
+    "category": "layering",
+    "source": "FFIEC BSA/AML Examination Manual, Appendix F – Money Laundering Red Flags",
+    "text": "Layering red flags include: unusually complex transaction structures without logical business purpose; multiple funds transfers routed through various accounts and jurisdictions; funds received and quickly forwarded to unrelated parties without economic justification; multiple layers of third-party service providers unnecessarily involved in transactions; funds transferred among related accounts without economic substance. The presence of layering indicators combined with a withdrawal ratio above 80% and links to other flagged accounts elevates risk classification to Critical."
+  },
+  {
+    "policy_id": "FINCEN-SAR-1",
+    "title": "FinCEN SAR Filing Obligations – Thresholds and Timeframes",
+    "category": "sar_filing",
+    "source": "FinCEN SAR FAQs (October 2025); Bank Secrecy Act 31 U.S.C. §5318(g)",
+    "text": "Financial institutions must file a Suspicious Activity Report (SAR) when they know, suspect, or have reason to suspect that a transaction involves funds from illegal activity, is designed to evade reporting requirements, lacks a lawful purpose, or involves use of the institution to facilitate criminal activity. Minimum threshold: USD 5,000 for broker-dealers and MSBs; USD 5,000 aggregate for banks. Timeframe: initial SAR must be filed within 30 calendar days of detecting facts constituting suspicious activity. For continuing suspicious activity, a follow-up SAR must be filed at minimum every 90 days, with a filing deadline of 120 calendar days after the prior SAR. The institution must not tip off the subject of a SAR. SAR data must be retained for 5 years. Prior SAR filing on an account is a material escalation factor."
+  },
+  {
+    "policy_id": "FINCEN-SAR-2",
+    "title": "FinCEN SAR – Categories of Suspicious Activity",
+    "category": "sar_filing",
+    "source": "FinCEN SAR Electronic Filing Instructions; Bank Secrecy Act",
+    "text": "FinCEN's SAR form includes the following categories of suspicious activity that must be checked when filing: account takeover; ACH fraud; cheque fraud; computer intrusion; identity theft; wire transfer fraud; structuring; money laundering; terrorist financing; mass marketing fraud; mortgage loan fraud; misuse of position or self-dealing; mysterious disappearance of funds; counterfeit instruments. For trading platforms, the most relevant categories are: account takeover (unauthorised access), structuring (threshold evasion), and money laundering (layering and integration). Multiple categories may apply to a single filing. Aggregate suspicious amounts across all transactions related to the same suspected scheme."
+  },
+  {
+    "policy_id": "FINCEN-STRUCT-1",
+    "title": "FinCEN Structuring – Definition and Legal Standard",
+    "category": "structuring",
+    "source": "Bank Secrecy Act 31 U.S.C. §5324; FinCEN Advisory FIN-2014-A001",
+    "text": "Structuring is defined as breaking up transactions that would otherwise trigger a Currency Transaction Report (CTR) at the USD 10,000 threshold. Structuring is illegal under 31 U.S.C. §5324 regardless of whether the underlying funds are from lawful sources. Detection indicators: multiple cash deposits on consecutive or same-day basis each just below USD 10,000; deposits of USD 9,000–9,999 that follow a pattern; customer requests to keep transactions below reporting thresholds; customer shows knowledge of CTR thresholds and adjusts behaviour accordingly. For online trading platforms, structuring is adapted: multiple deposits just below the platform's internal reporting or monitoring threshold (e.g., USD 500 per deposit when the review threshold is USD 500) constitute structuring. A high count of deposits below USD 500 relative to total deposit volume is a primary structuring indicator."
+  },
+  {
+    "policy_id": "FINCEN-TM-1",
+    "title": "FinCEN Transaction Monitoring – Risk-Based Alert Thresholds",
+    "category": "transaction_monitoring",
+    "source": "FinCEN AML Rule for Investment Advisers (2025); Risk-Based Compliance Guidance",
+    "text": "Risk-based transaction monitoring thresholds vary by customer risk tier. Standard thresholds: foreign wire transfers above USD 75,000 for low-risk customers, USD 20,000 for high-risk customers; third-party payments of any amount for high-risk customers; single transactions exceeding 300% of the customer's historical average; dormant account reactivation after 12 months. Velocity thresholds: rapid redemption cycles where withdrawal occurs within 30 days of deposit; 2 or more transactions of USD 5,000 or more within 30 days for high-risk accounts; 3 or more transactions between USD 8,000–9,999 within 30 days for standard accounts. PEP accounts: transactions above USD 25,000 require enhanced monitoring review."
+  },
+  {
+    "policy_id": "AML-WASH-1",
+    "title": "Wash Trading and Market Manipulation – AML Indicators",
+    "category": "wash_trading",
+    "source": "IOSCO Report on Market Manipulation; ESMA Guidelines on Transaction Reporting",
+    "text": "Wash trading involves executing trades that cancel each other out to create the appearance of market activity without real economic exposure. AML relevance: wash trading can be used to generate fictitious trading history to justify fund movements and obscure the true origin of funds. Detection indicators: trades with execution time under 15 seconds (below human reaction time threshold); win rate consistently above 80% without statistical basis; symmetric buy/sell patterns with no net position; extremely high trading volume relative to account size; trades executed at market extremes (open/close); high frequency of round-trip trades with minimal price movement. Trades under 15 seconds represent statistically impossible human reaction times and indicate automated manipulation or pre-arranged trades. A population of trades where more than 20% are under 15 seconds warrants investigation."
+  },
+  {
+    "policy_id": "AML-ATO-1",
+    "title": "Account Takeover – Detection Policy and Response Protocol",
+    "category": "account_takeover",
+    "source": "FinCEN SAR Category: Account Takeover; FFIEC Cybersecurity Red Flags",
+    "text": "Account takeover (ATO) occurs when an unauthorised party gains control of a legitimate account. ATO is a SAR-reportable event. Detection sequence: (1) legitimate account with established history shows login from a new device or IP in a foreign country; (2) multiple failed login attempts before successful access (brute force pattern); (3) immediate large withdrawal or transfer request following first successful login from new location; (4) new payment method added from a foreign country shortly after unauthorised access; (5) open complaint or hack report filed by the legitimate account holder. Combined indicator protocol: brute_force_pattern=True + new_device_last_7d=True + has_new_foreign_card=True + open hack complaint = Critical ATO classification requiring immediate account suspension and SAR filing within 30 days. Geographic shift (login from country A for 12+ months followed by login from country B) without corresponding customer notification is a primary ATO trigger."
+  },
+  {
+    "policy_id": "AML-PEP-1",
+    "title": "PEP and Sanctions Screening Policy",
+    "category": "pep_screening",
+    "source": "FATF Recommendation 12; OFAC SDN List Requirements; EU 4AMLD",
+    "text": "Politically Exposed Persons (PEPs) are individuals who hold or have held prominent public functions, including heads of state, senior politicians, senior government officials, judicial or military officials, senior executives of state-owned enterprises, and important political party officials. Family members and close associates of PEPs carry equivalent risk. Required actions for PEP-flagged accounts: (1) senior management approval required before onboarding; (2) source of wealth and source of funds must be established and documented; (3) enhanced ongoing monitoring with transaction review at any amount; (4) relationship subject to annual review. Sanctions screening: all accounts must be screened against OFAC SDN list, EU Consolidated Sanctions List, UN Security Council Consolidated List, and relevant national sanctions lists at onboarding and on a continuous basis. Any match or close name match triggers immediate account freeze pending compliance review. Sanctions hits are not discretionary — automatic blocking is required by law."
+  },
+  {
+    "policy_id": "AML-VELOCITY-1",
+    "title": "Transaction Velocity and High-Frequency Activity Policy",
+    "category": "velocity",
+    "source": "FATF Guidance on High-Risk Customer Types; FFIEC BSA/AML Examination Manual",
+    "text": "High transaction velocity is a primary indicator of money laundering, particularly in the placement and layering phases. Velocity red flags: login count above 3 standard deviations from the population mean in a 7-day window; more than 20 transactions in a 24-hour period inconsistent with customer profile; deposit count in 7 days exceeding population 99th percentile; rapid sequential deposits from multiple payment methods within 24 hours; simultaneous or near-simultaneous login events from geographically distant locations (impossible travel). For trading platforms: deposit count above population 99th percentile combined with withdrawal ratio above 0.85 constitutes a velocity-structuring combined indicator. High-velocity accounts that are also linked to other accounts via shared device or IP represent a critical multi-factor risk requiring SAR filing."
+  },
+  {
+    "policy_id": "AML-KYC-1",
+    "title": "KYC Failure Escalation Policy",
+    "category": "kyc",
+    "source": "FATF Recommendation 10; FATF Recommendation 17; Bank Secrecy Act",
+    "text": "Failed KYC attempts represent a material risk indicator. Escalation thresholds: 1 failed KYC attempt — document and monitor; 2 failed KYC attempts — enhanced monitoring, limit account functionality, trigger manual review; 3 or more failed KYC attempts — suspend account activity, escalate to compliance officer, file SAR if suspicious activity is concurrent. Failed KYC in combination with other risk flags (high deposit volume, PEP status, linked accounts, or suspicious transaction patterns) elevates the risk classification to High or Critical regardless of other individual factor scores. Accounts with failed KYC must not have deposit/withdrawal limits increased until KYC is fully resolved."
+  },
+  {
+    "policy_id": "AML-CHARGEBACK-1",
+    "title": "Chargeback and Dispute Policy – Fraud Indicators",
+    "category": "chargeback",
+    "source": "Visa/Mastercard Chargeback Guidelines; FinCEN Guidance on Third-Party Payment Processors",
+    "text": "Chargebacks represent a customer or bank disputing a transaction, most commonly indicating: unauthorised card use, account takeover, friendly fraud (deliberate dispute of legitimate transactions), or first-party fraud (deposit then dispute after withdrawal). One chargeback — investigate immediately; two or more chargebacks — Critical risk classification. Chargeback combined with account takeover indicators (new device, foreign IP, open complaint) constitutes a multi-vector fraud scenario requiring immediate account suspension and SAR filing. High chargeback rate (above 1% of transactions) may trigger payment processor termination and requires compliance escalation. Chargebacks after deposit-then-withdrawal sequences indicate first-party fraud (money extracted before chargeback reverses the deposit)."
+  },
+  {
+    "policy_id": "AML-LINKED-1",
+    "title": "Linked Account Detection and Ring Investigation Policy",
+    "category": "mule_account",
+    "source": "FATF Guidance on Money Mules; FFIEC BSA/AML Examination Manual",
+    "text": "Linked accounts — those sharing a device ID, IP address, payment method, or other technical identifier — require coordinated investigation as a potential money mule ring. Investigation protocol: (1) identify all accounts sharing any technical identifier; (2) calculate aggregate deposits and withdrawals across all ring members; (3) map fund flows between ring accounts; (4) assess whether ring accounts collectively structure deposits below individual thresholds. Risk escalation: 2 linked accounts — elevated risk; 3–4 linked accounts — High risk; 5 or more linked accounts — Critical risk, mandatory SAR filing. Linked accounts with combined withdrawal ratio above 0.80 must be treated as an active mule ring. Device linkage is considered stronger evidence than IP linkage (IPs can be shared by legitimate users on the same network; device IDs are more uniquely identifying)."
+  },
+  {
+    "policy_id": "AML-GEO-1",
+    "title": "Geographic Risk Assessment Policy",
+    "category": "geographic_risk",
+    "source": "FATF High-Risk and Non-Cooperative Jurisdictions; OFAC Country Programs",
+    "text": "Geographic risk must be assessed at onboarding, on login, and on each transaction. High-risk jurisdiction indicators: customer registered in an FATF grey-listed or black-listed country; login or transaction originating from a sanctioned country; IP address or payment card BIN from a high-risk jurisdiction inconsistent with customer's stated country of residence; routing of funds through multiple jurisdictions without business justification. FATF grey-listed countries (as of 2024) include: Bulgaria, Burkina Faso, Cameroon, Croatia, Democratic Republic of the Congo, Haiti, Kenya, Mali, Monaco, Mozambique, Namibia, Nigeria, Philippines, Senegal, South Africa, Syria, Tanzania, Venezuela, Vietnam, Yemen. Sanctioned countries (OFAC): Cuba, Iran, North Korea, Russia (partial), Syria. Any transaction or login involving a sanctioned country requires immediate escalation and regulatory notification."
+  },
+  {
+    "policy_id": "AML-WITHDRAWAL-1",
+    "title": "Withdrawal Pattern Monitoring Policy",
+    "category": "withdrawal_patterns",
+    "source": "FATF Guidance on Placement, Layering, Integration; FFIEC BSA/AML Manual",
+    "text": "Withdrawal patterns indicating money laundering: (1) Placement indicators — large cash deposits followed by quick withdrawal in different form; (2) Layering indicators — funds moved rapidly through accounts before withdrawal, withdrawal ratio above 85% of deposits, average time from deposit to withdrawal under 48 hours; (3) Integration indicators — funds withdrawn as apparent legitimate income after cycling through trading platform. Critical withdrawal thresholds: withdrawal ratio above 0.85 in 90-day observation window — escalate to High risk; withdrawal ratio above 0.95 — Critical, file SAR consideration; largest single withdrawal exceeds 50% of total historical deposits — investigate source of funds; withdrawal within 24 hours of deposit without trading activity — layering indicator. Withdrawal to a different payment method than used for deposit (reverse money laundering) is a strong indicator of money laundering and must be flagged."
+  },
+  {
+    "policy_id": "DERIV-AML-1",
+    "title": "Binary Options and CFD Platform – Specific AML Obligations",
+    "category": "trading_platform",
+    "source": "EU 5th Anti-Money Laundering Directive (5AMLD); MiFID II; FCA Guidance for Online Trading Firms",
+    "text": "Online trading platforms offering binary options, CFDs, and similar derivative products face specific AML obligations: (1) All customers must complete KYC before first withdrawal regardless of deposit amount; (2) Source of funds must be documented for deposits above EUR 15,000 in any 12-month period; (3) Transaction monitoring must cover both deposits/withdrawals and trading activity — high trading volume with consistently high win rates without statistical basis is suspicious; (4) Bonus abuse — depositing to claim bonuses then withdrawing immediately — is a reportable pattern; (5) Accounts opened with synthetic or fraudulent identities must be identified through document verification; (6) Chargebacks on trading deposits must be investigated as potential card fraud. Trading platforms must maintain AML programmes that address the specific typologies of trading-based money laundering: using trading losses as a method to layer funds, using winning trades to integrate illicit funds as legitimate winnings."
+  },
+  {
+    "policy_id": "WOLFSBERG-1",
+    "title": "Wolfsberg Group Principles – Enhanced Due Diligence Triggers",
+    "category": "enhanced_due_diligence",
+    "source": "Wolfsberg Group AML Principles for Private Banking (2012)",
+    "text": "Enhanced due diligence (EDD) is required when any of the following triggers are present: (1) customer is a PEP or connected to a PEP; (2) customer or transaction involves a high-risk jurisdiction; (3) account shows unusual transaction patterns inconsistent with stated purpose; (4) source of wealth or funds cannot be adequately explained; (5) customer is subject to adverse media coverage indicating potential financial crime involvement; (6) third-party payments or receipts with no apparent nexus to the customer's business; (7) complex ownership or control structures without apparent legitimate purpose. EDD measures include: obtaining additional documentation on source of wealth and funds, conducting senior management sign-off, performing enhanced ongoing transaction monitoring, and setting lower transaction alert thresholds. EDD is an ongoing obligation — it does not end at onboarding."
+  },
+  {
+    "policy_id": "OFAC-1",
+    "title": "OFAC Sanctions Compliance – Mandatory Blocking and Reporting",
+    "category": "sanctions",
+    "source": "OFAC SDN List; 31 C.F.R. Parts 500–599; OFAC Compliance Framework (2019)",
+    "text": "Compliance with OFAC sanctions is mandatory for all US persons and entities and for any transaction touching the US financial system, regardless of where the platform is incorporated. Required actions: (1) Screen all customers, beneficial owners, and counterparties against the SDN List at onboarding and on an ongoing basis; (2) Screen all transactions for OFAC-sanctioned jurisdictions, persons, or entities; (3) Block any property or funds of SDN-listed persons — do not transfer, withdraw, or pay out; (4) Report blocked transactions to OFAC within 10 business days; (5) Reject (return to sender) transactions that would violate sanctions but that cannot be blocked. Sanctions_flag = 1 on any account is an automatic Critical classification requiring immediate account suspension and OFAC reporting. No business justification overrides a confirmed sanctions match."
+  }
+]
